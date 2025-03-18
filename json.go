@@ -6,6 +6,18 @@ import (
 	"net/http"
 )
 
+func respondWithError(w http.ResponseWriter, code int, message string) {
+	if code > 499 {
+		log.Printf("HTTP Error %d: %s", code, message)
+	}
+
+	type errResponse struct {
+		Error string `json:"error"`
+	}
+
+	respondWithJson(w, code, errResponse{Error: message})
+}
+
 func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 	response, err := json.Marshal(payload)
 	if err != nil {
