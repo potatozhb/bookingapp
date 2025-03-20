@@ -7,24 +7,37 @@ package database
 
 import (
 	"context"
+	"time"
 )
 
 const createUser = `-- name: CreateUser :exec
 INSERT INTO users (id, name, created_at, updated_at)
-VALUES ($1, $2, $3, $4)
+VALUES (?, ?, ?, ?)
 `
 
-func (q *Queries) CreateUser(ctx context.Context) error {
-	_, err := q.db.ExecContext(ctx, createUser)
+type CreateUserParams struct {
+	ID        string
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
+	_, err := q.db.ExecContext(ctx, createUser,
+		arg.ID,
+		arg.Name,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+	)
 	return err
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, name, created_at, updated_at FROM users WHERE id = $1
+SELECT id, name, created_at, updated_at FROM users WHERE id = ?
 `
 
-func (q *Queries) GetUserByID(ctx context.Context) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByID)
+func (q *Queries) GetUserByID(ctx context.Context, id string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByID, id)
 	var i User
 	err := row.Scan(
 		&i.ID,

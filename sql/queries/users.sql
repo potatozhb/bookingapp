@@ -1,6 +1,6 @@
 -- name: CreateUser :exec
 INSERT INTO users (id, name, created_at, updated_at)
-VALUES ($1, $2, $3, $4);
+VALUES (?, ?, ?, ?);
 
 -- name: GetUserByID :one
-SELECT * FROM users WHERE id = $1;
+SELECT * FROM users WHERE id = ?;
